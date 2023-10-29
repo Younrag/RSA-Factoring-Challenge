@@ -420,10 +420,21 @@ if __name__ == "__main__":
         print("File not found")
         exit()
     start_time = time.time()
-    
-    num = int(lines[0].strip()) 
-    B,I = size_bound(num)
-    print(QS(num,B,I)) 
+
+    num = int(lines[0].strip())
+    if (num == 0 or num == 1):
+        print(f"{num}={num}*1")
+    elif (num <= 1000):
+        if is_probable_prime(num) == True:
+            print(f"{num}={num}*1")
+        else:
+            for i in range(2, num//2):
+                if num % i == 0:
+                    print(f"{num}={i}*{num//i}")
+                    break
+    else:
+        B,I = size_bound(num)
+        print(QS(num,B,I)) 
     if time.time() - start_time > 5:
         print("Time limit exceded")
         exit()
