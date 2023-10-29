@@ -10,7 +10,7 @@ def STonelli(n, p): #tonelli-shanks to solve modular square root, x^2 = N (mod p
     assert quad_residue(n, p) == 1, "not a square (mod p)"
     q = p - 1
     s = 0
-    
+
     while q % 2 == 0:
         q //= 2
         s += 1
@@ -94,31 +94,31 @@ def isqrt(n): # Newton's method, returns exact int for large squares
 def mprint(M): #prints a matrix in readable form
     for row in M:
         print(row)
-        
+
 def prime_gen(n): # sieve of Eratosthenes, generates primes up to a bound n
     if n < 2:
         return []
-    
+
     nums = []
     isPrime = []
-    
+
     for i in range(0, n+1):#Creates list of numbers from 0 to n
         nums.append(i)
         isPrime.append(True)
-        
+
     isPrime[0]=False
     isPrime[1]=False
-    
+
     for j in range(2,int(n/2)):#tries all size gaps that make sense
         if isPrime[j] == True:
             for i in range(2*j,n+1,j):#starts from j+j, jumps by gap size j and crosses out that number
                 isPrime[i] = False
-                
+
     primes = []
     for i in range(0, n+1):#Adds leftovers
         if isPrime[i] == True:
             primes.append(nums[i])
-            
+
     return primes
 
 
@@ -132,7 +132,7 @@ def quad_residue(a,n):
     x = q**l
     if x==0:
         return 1
-        
+
     a =a%n
     z=1
     while x!= 0:
@@ -148,7 +148,7 @@ def quad_residue(a,n):
 
 
 
-        
+
 def size_bound(N): # finds optimal factor base size and interval
 
     F = pow(exp(sqrt(log(N)*log(log(N)))),sqrt(2)/2)
@@ -157,14 +157,14 @@ def size_bound(N): # finds optimal factor base size and interval
     return int(F),int(I)
 
 
-    
+
 def find_base(N,B):
 # generates a B-smooth factor base
 
     factor_base = []
     primes = prime_gen(B)
     #print(primes)
-    
+
     for p in primes: # such that N is a quadratic residue mod p
         if quad_residue(N,p) == 1:
             factor_base.append(p)
@@ -174,7 +174,7 @@ def find_smooth(factor_base,N,I):
 # tries to find B-smooth numbers in sieve_seq, using sieving
 
     def sieve_prep(N,sieve_int):
-    # generates a sequence from Y(x) = x^2 - N, starting at x = root 
+    # generates a sequence from Y(x) = x^2 - N, starting at x = root
         sieve_seq = [x**2 - N for x in range(root,root+sieve_int)]
         #sieve_seq_neg = [x**2 - N for x in range(root,root-sieve_int,-1)]
         return sieve_seq
@@ -191,7 +191,7 @@ def find_smooth(factor_base,N,I):
     #print("")
     for p in factor_base[1:]: #not including 2
         residues = STonelli(N,p) #finds x such that x^2 = n (mod p). There are two start solutions
-        
+
         for r in residues:
             for i in range((r-root) % p, len(sieve_list), p): # Now every pth term will also be divisible
                 while sieve_list[i] % p == 0: #account for prime powers
@@ -199,7 +199,7 @@ def find_smooth(factor_base,N,I):
     xlist = [] #original x terms
     smooth_nums = []
     indices = [] # index of discovery
-    
+
     for i in range(len(sieve_list)):
         if len(smooth_nums) >= len(factor_base)+T: #probability of no solutions is 2^-T
             break
@@ -241,13 +241,13 @@ def build_matrix(smooth_nums,factor_base):
             return True, n
         else:
             pass
-        
-        M.append(exp_vector)  
+
+        M.append(exp_vector)
     #print("Matrix built:")
     #mprint(M)
     return(False, transpose(M))
 
-    
+
 def transpose(matrix):
 #transpose matrix so columns become rows, makes list comp easier to work with
     new_matrix = []
@@ -266,38 +266,38 @@ def transpose(matrix):
             del row
 
     return(M)'''
-        
+
 def gauss_elim(M):
 #reduced form of gaussian elimination, finds rref and reads off the nullspace
 #https://www.cs.umd.edu/~gasarch/TOPICS/factoring/fastgauss.pdf
-    
+
     #M = optimize(M)
     marks = [False]*len(M[0])
-    
+
     for i in range(len(M)): #do for all rows
         row = M[i]
         #print(row)
-        
+
         for num in row: #search for pivot
             if num == 1:
                 #print("found pivot at column " + str(row.index(num)+1))
                 j = row.index(num) # column index
                 marks[j] = True
-                
+
                 for k in chain(range(0,i),range(i+1,len(M))): #search for other 1s in the same column
                     if M[k][j] == 1:
                         for i in range(len(M[k])):
                             M[k][i] = (M[k][i] + row[i])%2
                 break
-    
+
     M = transpose(M)
-        
+
     sol_rows = []
     for i in range(len(marks)): #find free columns (which have now become rows)
         if marks[i]== False:
             free_row = [M[i],i]
             sol_rows.append(free_row)
-    
+
     if not sol_rows:
         return("No solution found. Need more smooth numbers.")
     #print("Found {} potential solutions".format(len(sol_rows)))
@@ -307,39 +307,39 @@ def solve_row(sol_rows,M,marks,K=0):
     solution_vec, indices = [],[]
     free_row = sol_rows[K][0] # may be multiple K
     for i in range(len(free_row)):
-        if free_row[i] == 1: 
+        if free_row[i] == 1:
             indices.append(i)
     for r in range(len(M)): #rows with 1 in the same column will be dependent
         for i in indices:
             if M[r][i] == 1 and marks[r]:
                 solution_vec.append(r)
                 break
-            
-    solution_vec.append(sol_rows[K][1])       
+
+    solution_vec.append(sol_rows[K][1])
     return(solution_vec)
-    
+
 def solve(solution_vec,smooth_nums,xlist,N):
-    
+
     solution_nums = [smooth_nums[i] for i in solution_vec]
     x_nums = [xlist[i] for i in solution_vec]
-    
+
     Asquare = 1
     for n in solution_nums:
         Asquare *= n
-        
+
     b = 1
     for n in x_nums:
         b *= n
 
     a = isqrt(Asquare)
-    
+
     factor = gcd(b-a,N)
     return factor
 
 
 def QS(n,B,I):
 #single polynomial version of quadratic sieve, given smoothness bound B and sieve interval I
-    
+
     global N
     global root
     global T #tolerance factor
@@ -347,54 +347,54 @@ def QS(n,B,I):
 
     if is_probable_prime(N):
         return "prime"
-    
+
     if isinstance(sqrt(N),int):
         return isqrt(N)
-    
+
     #print(root)
     #print("Attempting to factor {}...".format(N))
     #F,I = size_bound(N)
-    
+
     #print("Generating {}-smooth factor base...".format(B))
     factor_base = find_base(N,B) #generates a B-smooth factor base
     #print(factor_base)
 
     global F
     F = len(factor_base)
-    
+
     #print("Looking for {} {}-smooth relations...".format(F+T,B))
     smooth_nums,xlist,indices = find_smooth(factor_base, N,I)
     #finds B-smooth relations, using sieving and Tonelli-Shanks
-    
+
    # print("Found {} B-smooth numbers.".format(len(smooth_nums)))
-   
+
    # print(smooth_nums)
-    
+
     if len(smooth_nums) < len(factor_base):
         return("Not enough smooth numbers. Increase the sieve interval or size of the factor base.")
-    
+
    # print("Building exponent matrix...")
     is_square, t_matrix = build_matrix(smooth_nums,factor_base)
     #builds exponent matrix mod 2 from relations
-    
+
     if is_square == True:
         x = smooth_nums.index(t_matrix)
         factor = gcd(xlist[x]+sqrt(t_matrix),N)
-        #print("Found a square!")
-        return(f"{N}={int(factor)}*{int(N/factor)}")
-    
+        print("Found a square!")
+        return factor, N/factor
+
     #print("Performing Gaussian Elimination...")
     sol_rows,marks,M = gauss_elim(t_matrix) #solves the matrix for the null space, finds perfect square
     solution_vec = solve_row(sol_rows,M,marks,0)
-    
+
     '''vec = [0]*len(smooth_nums) # prints solution vector
     for i in solution_vec:
         vec[i] = 1
     print("Solution vector found: " + str(vec))'''
-    
+
     #print("Solving congruence of squares...")
     #print(solution_vec)
-    factor = solve(solution_vec,smooth_nums,xlist,N) #solves the congruence of squares to obtain factors
+    factor = solve(solution_vec,smooth_nums,xlist,N) #solves the congruence of squares to obtain facto
 
     for K in range(1,len(sol_rows)):
         if (factor == 1 or factor == N):
@@ -403,16 +403,18 @@ def QS(n,B,I):
             factor = solve(solution_vec,smooth_nums,xlist,N)
         else:
             #print("Found factors!")
-            return(f"{N}={int(factor)}*{int(N/factor)}")
-            
-            
+            return(f"{N}={factor}*{int(N/factor)}")
+
+
     return("Didn't find any nontrivial factors!")
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: rsa <>")
         exit()
     input_file = sys.argv[1]
-    
+
     try:
         with open(input_file, 'r') as f:
             lines =f.readlines()
@@ -420,10 +422,10 @@ if __name__ == "__main__":
         print("File not found")
         exit()
     start_time = time.time()
-    
-    num = int(lines[0].strip()) 
+
+    num = int(lines[0].strip())
     B,I = size_bound(num)
-    print(QS(num,B,I)) 
+    print(QS(num,B,I))
     if time.time() - start_time > 5:
         print("Time limit exceded")
         exit()
