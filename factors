@@ -1,38 +1,39 @@
-#!/usr/bin/env python3
-""" Factor numbers """
-from sys import argv
-from math import sqrt
+#!/usr/bin/python3
 
 
-def open_read_file(file_name):
-    """read from file
-    add to array
+import sys
+
+
+def find_divisor(num: int) -> int:
+
+    while num % 2 == 0:
+        return 2
+
+    factor = 3
+    while factor * factor <= num:
+        if num % factor == 0:
+            return factor
+        else:
+            factor += 2
+
+    return 1
+
+
+def factorize():
     """
-    with open(file_name, "r", encoding="utf-8") as file:
-        lines = file.readlines()
-    number_to_factor = []
-    for line in lines:
-        number_to_factor.append(int(line))
-    return number_to_factor
-
-
-def find_and_times(n):
-    """factor each
-    n given
+    Factorizes as many numbers as possible into
+    a product of two smaller numbers and print them.
     """
-    for i in range(2, n):
-        if n == ((n // i) * i):
-            print("{}={}*{}".format(n, (n // i), i))
-            break
+
+    with open(sys.argv[1]) as f:
+        line = f.readline()
+        while line != '':
+            num = int(line)
+            div = find_divisor(num)
+            print(f"{num}={num//div}*{div}")
+
+            line = f.readline()
 
 
-def fac_list(ls):
-    """factor each
-    num in ls
-    """
-    for i in ls:
-        find_and_times(i)
-
-
-if len(argv) == 2:
-    fac_list(open_read_file(argv[1]))
+if __name__ == "__main__":
+    factorize()
