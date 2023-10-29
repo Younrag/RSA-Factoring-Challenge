@@ -394,7 +394,7 @@ def QS(n,B,I):
 
     #print("Solving congruence of squares...")
     #print(solution_vec)
-    factor = solve(solution_vec,smooth_nums,xlist,N) #solves the congruence of squares to obtain factors
+    factor = solve(solution_vec,smooth_nums,xlist,N) #solves the congruence of squares to obtain facto
 
     for K in range(1,len(sol_rows)):
         if (factor == 1 or factor == N):
@@ -409,7 +409,7 @@ def QS(n,B,I):
     return("Didn't find any nontrivial factors!")
 
 
- if __name__ == "__main__":
+if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: rsa <>")
         exit()
